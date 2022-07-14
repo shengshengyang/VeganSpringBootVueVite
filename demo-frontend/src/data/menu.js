@@ -792,7 +792,80 @@ export default {
       name: "回首頁",
       to: "index",
       icon: "fa fa-home",
-      badge: 0,
+    },
+    {
+      name: "Manage",
+      heading: true,
+    },
+    {
+      name: "購物車",
+      icon: "fa fa-cart-shopping",
+      to: "shoppingCart",
+    },
+    {
+      name: "食記",
+      icon: "fa fa-pen-to-square",
+      to: "postIndex",
+    },
+    {
+      name: "前往論壇",
+      icon: "fa fa-book-quran",
+      to: "Forum-index",
+    },
+    {
+      name: "商家",
+      icon: "fa fa-shop",
+      sub: [
+        {
+          name: "店家加入",
+          icon: "fa fa-plus",
+          to: "BusinessRegister",
+        },
+      ],
+    },
+  ],
+  business: [
+    {
+      name: "回首頁",
+      to: "index",
+      icon: "fa fa-home",
+    },
+    {
+      name: "Manage",
+      heading: true,
+    },
+    {
+      name: "購物車",
+      icon: "fa fa-cart-shopping",
+      to: "shoppingCart",
+    },
+    {
+      name: "食記",
+      icon: "fa fa-pen-to-square",
+      to: "postIndex",
+    },
+    {
+      name: "前往論壇",
+      icon: "fa fa-book-quran",
+      to: "Forum-index",
+    },
+    {
+      name: "商家",
+      icon: "fa fa-shop",
+      sub: [
+        {
+          name: "商家後台",
+          icon: "si si-compass",
+          to: "business-backend-dashboard",
+        },
+      ],
+    },
+  ],
+  admin: [
+    {
+      name: "回首頁",
+      to: "index",
+      icon: "fa fa-home",
     },
     {
       name: "Manage",
@@ -811,35 +884,59 @@ export default {
     {
       name: "商家",
       icon: "fa fa-shop",
-      sub: [
-        {
-          name: "店家加入",
-          icon: "fa fa-plus",
-          to: "BusinessRegister",
-        },
-      ],
+      to: "index",
     },
     {
-      name: "Personal",
+      name: "前往論壇",
+      icon: "fa fa-book-quran",
+      to: "Forum-index",
+    },
+    {
+      name: "返回後台",
+      icon: "si si-compass",
+      to: "backend-dashboard",
+    },
+  ],
+  user: [
+    {
+      name: "回首頁",
+      to: "index",
+      icon: "fa fa-home",
+    },
+    {
+      name: "Manage",
       heading: true,
     },
     {
-      name: "Profile",
-      icon: "far fa-user",
-      sub: [
-        {
-          name: "Edit",
-          to: "#",
-        },
-        {
-          name: "Settings",
-          to: "#",
-        },
-        {
-          name: "Log out",
-          to: "#",
-        },
-      ],
+      name: "購物車",
+      icon: "fa fa-cart-shopping",
+      to: "shoppingCart",
     },
+    {
+      name: "食記",
+      icon: "fa fa-pen-to-square",
+      to: "postIndex",
+    },
+    {
+      name: "前往論壇",
+      icon: "fa fa-book-quran",
+      to: "Forum-index",
+    },
+    {
+      name: "會員後台",
+      icon: "fa fa-suer",
+      to: "index",
+    },
+    // {
+    //   name: "商家",
+    //   icon: "fa fa-shop",
+    //   sub: [
+    //     {
+    //       name: "商家後台",
+    //       icon: "fa fa-explore",
+    //       to: "BusinessRegister",
+    //     },
+    //   ],
+    // },
   ],
 };

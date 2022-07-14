@@ -50,12 +50,24 @@ async function onSubmit() {
   axios
     .post("http://localhost:8088/login", user)
     .then(function (response) {
-      console.log(response.data);
+      // console.log(response.data);
       if (response.status === 200) {
-        localStorage.setItem("access-admin", JSON.stringify(response.data));
-
-        location.replace("http://localhost:8080/#/backend/dashboard");
-        Swal.fire("登入成功 ~", "｡:.ﾟヽ(*´∀`)ﾉﾟ.:｡", "success");
+        // Swal.fire("登入成功 ~", "｡:.ﾟヽ(*´∀`)ﾉﾟ.:｡", "success");
+        Swal.fire({
+          title: "登入成功 ~",
+          text: "｡:.ﾟヽ(*´∀`)ﾉﾟ.:｡",
+          timer: 1000,
+          icon: "success"
+        });
+        if (response.data.data.user != null) {
+          localStorage.setItem("access-admin", JSON.stringify(response.data));
+          store.getStates({ admin: response.data });
+          location.replace("http://localhost:8080/#/backend/dashboard");
+        } else {
+          localStorage.setItem("access-business", JSON.stringify(response.data));
+          store.getStates({ business: response.data });
+          router.replace({ path: '/business/backend' });
+        }
       }
     })
     .catch(function (error) {
@@ -64,8 +76,8 @@ async function onSubmit() {
       } else if (error.response.status === 400) {
         Swal.fire("登入失敗,帳號或密碼錯誤", "(〒︿〒)", "error");
       } else {
-        console.log(error.response.status); // 印錯誤狀態代碼
-        console.log(error.response.data.error); // 印錯誤內容
+        console.log(error.code); // 印錯誤狀態代碼
+        console.log(error.message); // 印錯誤內容
       }
     });
 
@@ -110,7 +122,7 @@ async function onSubmit() {
                     <input type="text" class="form-control form-control-alt form-control-lg" id="login-username"
                       name="login-username" placeholder="E-mail" :class="{
                         'is-invalid': v$.account.$errors.length,
-                      }" v-model="state.account" @blur="v$.account.$touch" />
+                      }" v-model="state.account" @blur="v$.account.$touch" autocomplete="username" />
                     <div v-if="v$.account.$errors.length" class="invalid-feedback animated fadeIn">
                       請輸入你的帳號
                     </div>
@@ -119,7 +131,7 @@ async function onSubmit() {
                     <input type="password" class="form-control form-control-alt form-control-lg" id="login-password"
                       name="login-password" placeholder="密碼" :class="{
                         'is-invalid': v$.password.$errors.length,
-                      }" v-model="state.password" @blur="v$.password.$touch" />
+                      }" v-model="state.password" @blur="v$.password.$touch" autocomplete="current-password" />
                     <div v-if="v$.password.$errors.length" class="invalid-feedback animated fadeIn">
                       請輸入你的密碼
                     </div>

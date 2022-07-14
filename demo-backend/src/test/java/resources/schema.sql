@@ -26,6 +26,7 @@ CREATE TABLE business(
                          located nvarchar(64) not null,
                          businessPic nvarchar(64),
                          status nvarchar (32) not null,
+                         UUID nvarchar(256) ,
                          createdTime TIMESTAMP not null ,
                          lastLoginTime TIMESTAMP not null,
                          updateTime  TIMESTAMP not null
@@ -42,7 +43,8 @@ CREATE TABLE reserve (
                          reserveTime DATETIME not null ,
                          restaurantId int not null,
                          businessId int not null,
-                         userId int
+                         reserveName nvarchar(64) not null ,
+                         reservePhone nvarchar(64) not null
 );
 
 -- pos
@@ -51,7 +53,8 @@ CREATE TABLE pos (
                   posId INT NOT NULL auto_increment primary key,
                   businessId Int not null UNIQUE,
                   validDate nvarchar(64) not null,
-                  expiryDate DATETIME
+                  expiryDate DATETIME,
+                  UUID nvarchar(256)
 );
 
 -- PosBusiness
@@ -61,8 +64,7 @@ CREATE TABLE posBusiness (
                      posId              INT NOT NULL,
                      businessId         INT NOT NULL,
                      visitors           INT NOT NULL,
-                     turnOver           INT NOT NULL,
-                     businessName       nvarchar(128) NOT NULL
+                     turnOver           INT NOT NULL
 );
 
 -- product
@@ -171,17 +173,37 @@ CREATE TABLE post(
                      postedText NVARCHAR(8192) NOT NULL,
                      imgUrl NVARCHAR(256),
                      postStatus NVARCHAR(256),
-                     postAuditDate DATETIME
+                     postAuditDate DATETIME,
+                     postCategory NVARCHAR(256),
+                     likeCount INT default 0
+);
+
+-- favorite post
+drop table if exists fav_post;
+CREATE TABLE fav_post(
+                     postId INT NOT NULL ,
+                     favDate DATETIME NOT NULL,
+                     userId INT NOT NULL
+                    
+);
+-- like post
+drop table if exists like_post;
+CREATE TABLE like_post(
+                     postId INT NOT NULL ,
+                     likeDate DATETIME NOT NULL,
+                     userId INT NOT NULL
+                    
 );
 
 -- forum
 DROP TABLE IF EXISTS forum;
 CREATE TABLE forum(
-                      forumId int NOT NULL auto_increment primary key,
-                      forumTitle nvarchar(128) NOT NULL,
-                      forumContent nvarchar(512) NOT NULL,
-                      forumCreateTime TIMESTAMP NOT NULL,
-                      forumUpdateTime TIMESTAMP NOT NULL
-);
+	forumId int NOT NULL auto_increment primary key,
+	forumTitle nvarchar(50) NOT NULL,
+	forumContent nvarchar(1024) NOT NULL,
+	forumCategory VARCHAR(64) NOT NULL,
+	forumImage nvarchar(640),
+	forumCreateTime TIMESTAMP NOT NULL,
+	forumUpdateTime TIMESTAMP NOT NULL);
 
 drop table if exists users;

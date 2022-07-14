@@ -24,15 +24,17 @@ public class Post {
 
 	private String imgurl;
 
-//	    @ManyToOne(cascade = CascadeType.ALL)
-//		@JoinColumn(name = "postStatus_id", nullable = false)
-//		private PostSataus postSataus; 
-
 	private String postStatus;
 
 	private Date postAuditDate;
 
+	private String postCategory;
+	
+	private Integer likeCount;
+
 //	    private MultipartFile postImage;
+
+	
 
 	public Post() {
 
@@ -144,6 +146,22 @@ public class Post {
 
 	public void setPostAuditDate(Date postAuditDate) {
 		this.postAuditDate = postAuditDate;
+	}
+	
+	public String getPostCategory() {
+		return postCategory;
+	}
+
+	public void setPostCategory(String postCategory) {
+		this.postCategory = postCategory;
+	}
+	
+	public Integer getLikeCount() {
+		return likeCount;
+	}
+
+	public void setLikeCount(Integer likeCount) {
+		this.likeCount = likeCount;
 	}
 
 //		public PostSataus getPostSataus() {

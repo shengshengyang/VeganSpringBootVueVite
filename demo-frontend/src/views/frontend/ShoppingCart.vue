@@ -6,7 +6,7 @@ import axios from "axios";
 const url = "localhost:8088";
 const urlParams = ref(
   {
-    limit: 15,
+    limit: 20,
     offset: 0,
     category: null,
     veganCategory: null,
@@ -134,13 +134,25 @@ getAxios();
   </div>
   <!-- 這邊是查詢功能放的地方 -->
 
-  <!-- 這邊是下拉式選單 -->
-  <!-- 素種類選單 -->
-  <div class="row items-push mb-4">
+
+  <div class="row items-push  ">
     <div class="col-sm-6 col-xl-4">
+      <!-- 這邊是輸入名稱搜尋 -->
+      <div class="input-group ">
+        <input type="text" class="form-control fs-base" placeholder="想要找什麼呢？" v-model="urlParams.search"
+          @keyup="getAxios()" />
+        <span class="input-group-text">
+          <i class="fa fa-search"></i>
+        </span>
+      </div>
+    </div>
+    <!-- 這邊是下拉式選單 -->
+    <!-- 素種類選單 -->
+    <div class="col-sm-2 col-xl-1">
       <div class="dropdown">
         <button type="button" class="btn btn-alt-info dropdown-toggle" id="dropdown-default-alt-info"
           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <!-- 一開始會是null值顯示不出文字，用v-if判斷 -->
           <a v-if="urlParams.veganCategory == null">
             素種類
           </a>
@@ -208,7 +220,7 @@ getAxios();
       </div>
     </div>
     <!--    種類選單 -->
-    <div class="col-sm-6 col-xl-4">
+    <div class="col-sm-1 col-xl-1">
       <div class="dropdown">
         <button type="button" class="btn btn-alt-info dropdown-toggle" id="dropdown-default-alt-info"
           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -447,11 +459,12 @@ btn-outline-danger" data-bs-dismiss="modal">
           <!-- 下拉顯示選單 -->
           <BaseBlock :title="`  商品詳細描述 `" btn-option-content>
             <template #subtitle>
-              這裡可以放副標題
+              <!-- 這裡可以放副標題 -->
             </template>
             <div class="row items-push-2x text-center">
-              這裡會顯示商品的詳細描述
-              {{ singleProduct.description }}
+              <!-- 這裡會顯示商品的詳細描述 -->
+              <div v-html="singleProduct.description">
+              </div>
             </div>
           </BaseBlock>
 

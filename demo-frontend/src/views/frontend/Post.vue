@@ -2,6 +2,7 @@
 // 已經宣告但從未使用過的Value (請勿刪除)
 import { ref } from "vue";
 import axios from "axios";
+import { useRouter } from "vue-router";
 
 // Vue Dataset, for more info and examples you can check out https://github.com/kouts/vue-dataset/tree/next
 import {
@@ -24,6 +25,8 @@ const resPostTitle = ref();
 const resPostText = ref();
 const resPostStatus = ref("待審核");
 
+const router = useRouter();
+
 const getAxios = function () {
   axios
     .get(`http://${url}/postStatusList`)
@@ -40,6 +43,79 @@ const getAxios = function () {
 //執行Axios
 getAxios();
 // For Filters
+
+//發布中文章(全素)
+function Category1() {
+  //send request to server
+  axios
+    .get(`http://${url}/postCategory1`)
+    .then((res) => {
+      //獲取伺服器的回傳資料
+      resData.value = res.data;
+    })
+    .catch((error) => {
+      console.log(error, "失敗");
+    });
+}
+//發布中文章(蛋素)
+function Category2() {
+  //send request to server
+  axios
+    .get(`http://${url}/postCategory2`)
+    .then((res) => {
+      //獲取伺服器的回傳資料
+      resData.value = res.data;
+    })
+    .catch((error) => {
+      console.log(error, "失敗");
+    });
+}
+//發布中文章(奶素)
+function Category3() {
+  //send request to server
+  axios
+    .get(`http://${url}/postCategory3`)
+    .then((res) => {
+      //獲取伺服器的回傳資料
+      resData.value = res.data;
+    })
+    .catch((error) => {
+      console.log(error, "失敗");
+    });
+}
+//發布中文章(蛋奶素)
+function Category4() {
+  //send request to server
+  axios
+    .get(`http://${url}/postCategory4`)
+    .then((res) => {
+      //獲取伺服器的回傳資料
+      resData.value = res.data;
+    })
+    .catch((error) => {
+      console.log(error, "失敗");
+    });
+}
+//發布中文章(植物五辛素)
+function Category5() {
+  //send request to server
+  axios
+    .get(`http://${url}/postCategory5`)
+    .then((res) => {
+      //獲取伺服器的回傳資料
+      resData.value = res.data;
+    })
+    .catch((error) => {
+      console.log(error, "失敗");
+    });
+}
+
+//跳到食記詳細頁面
+function findPost(id) {
+  //send request to server
+  console.log(id);
+  router.push({ name: "postPage", params: { postId: id } });
+}
 </script>
 <style>
 .card-text {
@@ -60,13 +136,51 @@ getAxios();
     <!-- 上方主題分類 -->
 
     <div class="row justify-content-center text-center">
-      <div class="col-md-3 mb-4">
+      <div class="col-md-12 mb-4">
         <BaseBackground>
-          <div class="d-grid gap-2 d-md-flex">
-            <button type="button" class="btn btn-alt-info">Info</button>
-            <button type="button" class="btn btn-alt-info">Left</button>
-            <button type="button" class="btn btn-alt-info">Middle</button>
-            <button type="button" class="btn btn-alt-info">Right</button>
+          <div class="col-xs-4">
+            <button
+              type="button"
+              class="btn btn-alt-info"
+              @click.prevent="getAxios"
+            >
+              全部
+            </button>
+            <button
+              type="button"
+              class="btn btn-alt-info"
+              @click.prevent="Category1()"
+            >
+              全素
+            </button>
+            <button
+              type="button"
+              class="btn btn-alt-info"
+              @click.prevent="Category2()"
+            >
+              蛋素
+            </button>
+            <button
+              type="button"
+              class="btn btn-alt-info"
+              @click.prevent="Category3()"
+            >
+              奶素
+            </button>
+            <button
+              type="button"
+              class="btn btn-alt-info"
+              @click.prevent="Category4()"
+            >
+              蛋奶素
+            </button>
+            <button
+              type="button"
+              class="btn btn-alt-info"
+              @click.prevent="Category5()"
+            >
+              植物五辛素
+            </button>
           </div>
         </BaseBackground>
       </div>
@@ -86,9 +200,8 @@ getAxios();
             <div class="card">
               <!--Card image-->
               <div class="view overlay">
-                <img
-                  class="card-img-top"
-                  src="https://mdbootstrap.com/img/Photos/Others/images/14.jpg"
+                <img :src="item.imgurl"
+                  class="card-img-top"             
                   alt="Card image cap"
                 />
                 <a href="#!">
@@ -101,13 +214,16 @@ getAxios();
                 <h4 class="card-title">{{ item.title }}</h4>
                 <!--Text-->
                 <div clss="card-box">
-                  <p class="card-text">
-                    {{ item.postedText }}
-                  </p>
+                  <div class="card-text" v-html="item.postedText"></div>
                 </div>
                 <br />
                 <!-- Provides extra visual weight and identifies the primary action in a set of buttons -->
-                <button type="button" class="btn rounded-0 btn-outline-info">
+
+                <button
+                  type="button"
+                  class="btn rounded-0 btn-outline-info"
+                  @click="findPost(item.postId)"
+                >
                   Read More
                 </button>
               </div>

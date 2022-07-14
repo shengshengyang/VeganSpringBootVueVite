@@ -10,14 +10,31 @@ import LayoutBackend from "@/layouts/variations/Backend.vue";
 import LayoutBackendBoxed from "@/layouts/variations/BackendBoxed.vue";
 import LayoutBackendMegaMenu from "@/layouts/variations/BackendMegaMenu.vue";
 
+//設定Business LayOuting 模板
+import BLayoutBackend from "@/BusinessLayouts/variations/Backend.vue";
+// import BLayoutBackendBoxed from "@/BusinessLayouts/variations/BackendBoxed.vue";
+// import BLayoutBackendMegaMenu from "@/BusinessLayouts/variations/BackendMegaMenu.vue";
+
 // Frontend: Index
 const Index = () => import("@/views/frontend/Index.vue");
 const Login = () => import("@/views/frontend/Login.vue");
 const UserRegister = () => import("@/views/frontend/Register.vue");
 const BusinessRegister = () => import("@/views/frontend/BusinessRegister.vue");
+//購物車
 const ShoppingCart = () => import("@/views/frontend/ShoppingCart.vue");
+const ShoppingOrder = () => import("@/views/frontend/ShoppingOrder.vue");
+const ShoppingCheckOut = () => import("@/views/frontend/CheckOut.vue");
+const ShoppingCheckOutSuccess = () =>
+  import("@/views/frontend/CheckOutSuccess.vue");
 const Post = () => import("@/views/frontend/Post.vue");
+const PostContent = () => import("@/views/frontend/PostContent.vue");
 const SearchRestaurant = () => import("@/views/frontend/SearchRestaurant.vue");
+const ForumIndex = () => import("@/views/frontend/ForumIndex.vue");
+const BusinessBackend = () => import("@/views/frontend/BusinessBackend.vue");
+const BusinessProfileView = () =>
+  import("@/views/frontend/businessBackend/BusinessProfileView.vue");
+const BusinessCalendar = () =>
+  import("@/views/frontend/businessBackend/BusinessCalendar.vue");
 
 // Backend Boxed: Dashboard
 const BackendBoxedDashboard = () =>
@@ -50,6 +67,8 @@ const VeganForumsDashboard = () =>
   import("@/views/vegan/forums/DashboardView.vue");
 const VeganForumsForumsInfo = () =>
   import("@/views/vegan/forums/ForumsInfo.vue");
+const VeganForumsInsertForum = () =>
+  import("@/views/vegan/forums/InsertForum.vue");
 //愛蔬網後台: posts
 const VeganPostsDashboard = () =>
   import("@/views/vegan/posts/DashboardView.vue");
@@ -294,10 +313,26 @@ const routes = [
         name: "BusinessRegister",
         component: BusinessRegister,
       },
+      // 購物車
       {
         path: "/shopping",
         name: "shoppingCart",
         component: ShoppingCart,
+      },
+      {
+        path: "/shopping/order",
+        name: "shoppingOrder",
+        component: ShoppingOrder,
+      },
+      {
+        path: "/shopping/checkout",
+        name: "shoppingCheckOut",
+        component: ShoppingCheckOut,
+      },
+      {
+        path: "/shopping/checkoutSuccess",
+        name: "shoppingCheckOutSuccess",
+        component: ShoppingCheckOutSuccess,
       },
       {
         path: "/post",
@@ -305,9 +340,29 @@ const routes = [
         component: Post,
       },
       {
+        path: "/postContent/:postId?",
+        name: "postPage",
+        component: PostContent,
+      },
+      {
         path: "/searchRestaurant",
         name: "restaurantIndex",
         component: SearchRestaurant,
+      },
+      {
+        path: "/business/backend/dashboard",
+        name: "business-backend-dashboard",
+        component: BusinessBackend,
+      },
+      {
+        path: "/business/backend/profile",
+        name: "business-backend-profile",
+        component: BusinessProfileView,
+      },
+      {
+        path: "/forumIndex",
+        name: "Forum-index",
+        component: ForumIndex,
       },
     ],
   },
@@ -474,6 +529,11 @@ const routes = [
             path: "forumsinfo",
             name: "backend-forums-forums-info",
             component: VeganForumsForumsInfo,
+          },
+          {
+            path: "insertForum",
+            name: "backend-forums-insert-forum",
+            component: VeganForumsInsertForum,
           },
         ],
       },
@@ -1152,6 +1212,28 @@ const routes = [
       },
     ],
   },
+  {
+    path: "/business/backend",
+    redirect: "/business/backend/dashboard",
+    component: BLayoutBackend,
+    children: [
+      {
+        path: "dashboard",
+        name: "business-backend-dashboard",
+        component: BusinessBackend,
+      },
+      {
+        path: "/profile",
+        name: "business-backend-profile",
+        component: BusinessProfileView,
+      },
+      {
+        path: "/reserve",
+        name: "business-backend-reserve",
+        component: BusinessCalendar,
+      },
+    ],
+  },
 ];
 
 // Create Router
@@ -1181,16 +1263,19 @@ router.afterEach((to, from) => {
 
 export default router;
 
-// router.beforeEach(() => {
-//   if(to.path.startsWith('/signin')) {
-//     window.localStorage.removeItem('access-admin')
-//     next()
-//   } else {
-//     let admin = JSON.parse(window.localStorage.getItem('access-admin'))
-//     if(!admin){
-//       next({path:'/signin'})
-//     } else {
-//       next()
-//     }
-//   }
-// })
+router.beforeEach((to) => {
+  const admin = localStorage.getItem("access-admin"); //取admin 登入資訊
+  const business = localStorage.getItem("access-business"); //business 登入資訊
+  const user = localStorage.getItem("access-user"); //user 登入資訊
+  const isLogin = admin || business || user; //若有取得到1種就表示有登入
+
+  if (
+    !isLogin &&
+    to.name !== "login" &&
+    to.name !== "index" &&
+    to.name !== "userRegister" &&
+    to.name !== "Forum-index"
+  ) {
+    return { name: "login" };
+  }
+});
