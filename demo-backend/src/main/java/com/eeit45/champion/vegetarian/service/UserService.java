@@ -29,7 +29,23 @@ public interface UserService {
 	User login(LoginRequest loginRequest);
 	
 	User resetPassword(LoginRequest loginRequest);
+	
+	int updateImage(String base64DataString, int id);
+	
+	int updateUserName(String name, int id);
 
+	int updatePassword(String password, String newPassword, int id);
+	
+	Integer countUser();
+	
+	Integer countRegister();
+	
+	Integer countLogin();
+	
+	Double countPercentLogin();
+	
+	int updateStatus(String status, String email);
+	
 //	boolean isBanned(UserRequest userRequest);
 
 }

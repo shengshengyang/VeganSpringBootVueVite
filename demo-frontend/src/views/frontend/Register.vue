@@ -67,8 +67,9 @@ async function onSubmit() {
     .post("http://localhost:8088/user/register", user)
     .then(function (response) {
       if (response.status === 200) {
-        Swal.fire("註冊成功 ~", "⁽⁽٩(๑˃̶͈̀ ᗨ ˂̶͈́)۶⁾⁾", "success");
-        location.replace("http://localhost:8080/#/signin");
+        Swal.fire(`請前往${state.email}完成驗證`, "⁽⁽٩(๑˃̶͈̀ ᗨ ˂̶͈́)۶⁾⁾", "success");
+        localStorage.setItem("registerInfo", state.email);
+        // location.replace("http://localhost:8080/#/signin");
       }
     })
     .catch(function (error) {
@@ -87,6 +88,27 @@ history.pushState(null, null, document.URL);
 window.addEventListener('popstate', function () {
   history.pushState(null, null, document.URL);
 });
+
+function add() {
+  state.email = 'hold10sec8763@gmail.com';
+  state.password = '10Sec8763';
+  state.confirmPassword = '10Sec8763';
+  state.username = '銅人';
+  state.terms = true;
+}
+
+function showPassword() {
+  var x = document.getElementById("signup-password");
+  var y = document.getElementById("signup-password-confirm");
+  if (x.type === "password" && y.type === "password") {
+    x.type = "text";
+    y.type = "text";
+  } else {
+    x.type = "password";
+    y.type = "password";
+  }
+}
+
 </script>
 
 <template>
@@ -113,14 +135,14 @@ window.addEventListener('popstate', function () {
 
             <div class="p-sm-3 px-lg-4 px-xxl-5 py-lg-5">
               <h1 class="h2 mb-1">申請帳號</h1>
-              <p class="fw-medium text-muted">請填入電子信箱及密碼</p>
+              <p class="fw-medium text-muted">請填入電子信箱、密碼及名稱</p>
 
               <!-- Sign Up Form -->
               <form @submit.prevent="onSubmit">
                 <div class="py-3">
                   <div class="mb-4">
-                    <input type="text" class="form-control form-control-lg form-control-alt" id="signup-email"
-                      name="signup-email" placeholder="example@mail.com" :class="{
+                    <input type="text" maxlength="60" class="form-control form-control-lg form-control-alt"
+                      id="signup-email" name="signup-email" placeholder="example@mail.com" :class="{
                         'is-invalid': v$.email.$errors.length,
                       }" v-model="state.email" @blur="v$.email.$touch" />
                     <div v-if="v$.email.$errors.length" class="invalid-feedback animated fadeIn">
@@ -128,8 +150,8 @@ window.addEventListener('popstate', function () {
                     </div>
                   </div>
                   <div class="mb-4">
-                    <input type="password" class="form-control form-control-lg form-control-alt" id="signup-password"
-                      name="signup-password" placeholder="密碼" :class="{
+                    <input type="password" maxlength="20" class="form-control form-control-lg form-control-alt"
+                      id="signup-password" name="signup-password" placeholder="密碼" :class="{
                         'is-invalid': v$.password.$errors.length,
                       }" v-model="state.password" @blur="v$.password.$touch" />
                     <div v-if="v$.password.$errors.length" class="invalid-feedback animated fadeIn">
@@ -137,7 +159,7 @@ window.addEventListener('popstate', function () {
                     </div>
                   </div>
                   <div class="mb-4">
-                    <input type="password" class="form-control form-control-lg form-control-alt"
+                    <input type="password" maxlength="20" class="form-control form-control-lg form-control-alt"
                       id="signup-password-confirm" name="signup-password-confirm" placeholder="確認密碼" :class="{
                         'is-invalid': v$.confirmPassword.$errors.length,
                       }" v-model="state.confirmPassword" @blur="v$.confirmPassword.$touch" />
@@ -146,8 +168,8 @@ window.addEventListener('popstate', function () {
                     </div>
                   </div>
                   <div class="mb-4">
-                    <input type="text" class="form-control form-control-lg form-control-alt" id="signup-username"
-                      name="signup-username" placeholder="使用者名稱" :class="{
+                    <input type="text" maxlength="25" class="form-control form-control-lg form-control-alt"
+                      id="signup-username" name="signup-username" placeholder="使用者名稱" :class="{
                         'is-invalid': v$.username.$errors.length,
                       }" v-model="state.username" @blur="v$.username.$touch" />
                     <div v-if="v$.username.$errors.length" class="invalid-feedback animated fadeIn">
@@ -159,11 +181,16 @@ window.addEventListener('popstate', function () {
                       <input class="form-check-input" type="checkbox" id="signup-terms" name="signup-terms" :class="{
                         'is-invalid': v$.terms.$errors.length,
                       }" v-model="state.terms" @blur="v$.terms.$touch" />
-                      <label class="form-check-label" for="signup-terms">我同意不殺生 &amp; 信教吃素</label>
+                      <label class="form-check-label" for="signup-terms">我同意會員條款</label>
                       <div v-if="v$.terms.$errors.length" class="invalid-feedback animated fadeIn">
-                        你若不同意則不適合吃素
+                        請勾選以完成註冊
                       </div>
                     </div>
+                  </div>
+                  <div class="mb-4">
+                    <!-- <div class="form-check"> -->
+                    <input class="form-check-input" type="checkbox" @click="showPassword()">&nbsp;&nbsp;顯示密碼
+                    <!-- </div> -->
                   </div>
                 </div>
                 <div class="row mb-4">
@@ -171,8 +198,15 @@ window.addEventListener('popstate', function () {
                     <button type="submit" class="btn w-100 btn-alt-success">
                       <i class="fa fa-fw fa-plus me-1 opacity-50"></i>註冊
                     </button>
+                  </div>&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+                  <div class="col-md-6 col-xl-5">
+                    <button type="button" class="btn w-100 btn-alt-success" @click="add">
+                      <i class="fa fa-fw fa-plus me-1 opacity-50"></i>一鍵
+                    </button>
                   </div>
                 </div>
+                <!-- <div><button @click="add">一鍵輸入</button>
+                </div> -->
               </form>
               <!-- END Sign Up Form -->
             </div>
@@ -191,7 +225,7 @@ window.addEventListener('popstate', function () {
       aria-hidden="true">
       <div class="modal-dialog modal-lg modal-dialog-popout" role="document">
         <div class="modal-content">
-          <BaseBlock title="Terms &amp; Conditions" transparent class="mb-0">
+          <BaseBlock title="愛蔬網 &amp; 隱私權條款" transparent class="mb-0">
             <template #options>
               <button type="button" class="btn-block-option" data-bs-dismiss="modal" aria-label="Close">
                 <i class="fa fa-fw fa-times"></i>

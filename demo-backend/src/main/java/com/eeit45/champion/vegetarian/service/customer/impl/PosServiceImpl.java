@@ -42,15 +42,9 @@ public class PosServiceImpl implements PosService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        Pos pos  = posDao.getPosByBusinessId(businessId);
-
-        if(pos != null ){
-            log.warn("此商家用戶 : {} , 已申請過POS系統" , businessId);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
 
         //更新business 系統狀態
-        businessDao.updateStatus(business.getBusinessId(),"未開通" , null);
+//        businessDao.updateStatus(business.getBusinessId(),"未開通" , null);
 
         Integer posId = posDao.buildPos(businessId,posRequest);
 
@@ -103,7 +97,26 @@ public class PosServiceImpl implements PosService {
             token = token.replaceAll("-","");
             businessDao.updateStatus(pos.getBusinessId(),posRequest.getValidDate().toString() , token);
             posRequest.setUUID(token);
-            posDao.updateStatus(posId,posRequest);
+            posDao.updateStatus(posId,pos.getBusinessId() , posRequest);
         }
+    }
+
+    @Override
+    public Pos getPosByBusinessId(Integer businessId) {
+        Business business = businessDao.getBusinessById(businessId);
+
+        if(business == null){
+            log.warn("businessId :{}不存在 ， POS查詢功能失敗 ", businessId);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        Pos pos = posDao.getPosByBusinessId(businessId);
+
+        if (pos == null){
+            log.warn("BusinessID :{} 尚未申請POS系統 ", businessId);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        return pos;
     }
 }

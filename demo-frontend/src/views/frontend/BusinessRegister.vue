@@ -23,8 +23,8 @@ const state = reactive({
   principalPhone: null,
   businessName: null,
   district: null,
-  businessPic: null,
-  // terms: null,
+  // businessPic: null,
+  terms: null,
 });
 
 // Validation rules
@@ -123,6 +123,17 @@ async function onSubmit() {
     });
   //  router.push({ name: "backend-pages-auth" });
 }
+
+function addform() {
+  state.email = 'carefuladdicted@gmail.com';
+  state.password = '10x65q76d53';
+  state.confirmPassword = '10x65q76d53';
+  state.principalName = '陳永盛';
+  state.principalPhone = "0988432167";
+  state.businessName = "小心上癮商店";
+  state.district = "臺北市";
+  state.terms = true;
+}
 </script>
 
 <template>
@@ -136,7 +147,7 @@ async function onSubmit() {
     ">
     <div class="content">
       <div class="row justify-content-center push">
-        <div class="col-md-8 col-lg-6 col-xl-4">
+        <div class="col-md-8 col-lg-6 col-xl-5">
           <!-- Sign Up Block -->
           <BaseBlock title="愛蔬網-商家註冊" class="mb-0">
             <template #options>
@@ -205,30 +216,17 @@ async function onSubmit() {
                     </div>
                   </div>
                   <div class="mb-4">
-                    <label class="form-label" for="val-district">營業餐廳名稱<span class="text-danger">*</span></label>
+                    <label class="form-label" for="val-district">公司名稱<span class="text-danger">*</span></label>
                     <input type="text" class="form-control form-control-lg form-control-alt" id="signup-businessName"
                       name="signup-businessName" :class="{
                         'is-invalid': v$.businessName.$errors.length,
                       }" v-model="state.businessName" @blur="v$.businessName.$touch" />
                     <div v-if="v$.businessName.$errors.length" class="invalid-feedback animated fadeIn">
-                      請輸入完整的餐廳名稱
+                      請輸入公司名稱
                     </div>
                   </div>
-                  <!-- <div class="mb-4">
-                    營業餐廳位置:
-                    <select class="form-select" id="signup-district" name="signup-district" :class="{
-                      'is-invalid': v$.district.$errors.length,
-                    }" v-model="state.district" @blur="v$.district.$touch">
-                      <option v-for="city in district" :key="city.value" :value="city.value">
-                        {{ city.name }}
-                      </option>
-                      <div v-if="v$.district.$errors.length" class="invalid-feedback animated fadeIn">
-                        請選擇您所在的區域
-                      </div>
-                    </select>
-                  </div> -->
                   <div class="mb-4">
-                    <label class="form-label" for="val-district">營業餐廳位置:<span class="text-danger">*</span></label>
+                    <label class="form-label" for="val-district">您計畫開業的區域:<span class="text-danger">*</span></label>
                     <select id="val-district" class="form-select" :class="{
                       'is-invalid': v$.district.$errors.length,
                     }" v-model="state.district">
@@ -257,6 +255,11 @@ async function onSubmit() {
                     <div class="col-md-6 col-xl-5">
                       <button type="submit" class="btn w-100 btn-alt-success">
                         <i class="fa fa-fw fa-plus me-1 opacity-50"></i>註冊
+                      </button>
+                    </div>
+                    <div class="col-md-6 col-xl-7">
+                      <button type="button" class="btn w-100 btn-alt-warning" @click="addform">
+                        <i class="fa fa-fw fa-fill me-1 opacity-50"></i> 一鍵輸入
                       </button>
                     </div>
                   </div>

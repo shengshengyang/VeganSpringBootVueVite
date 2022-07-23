@@ -15,26 +15,41 @@ import BLayoutBackend from "@/BusinessLayouts/variations/Backend.vue";
 // import BLayoutBackendBoxed from "@/BusinessLayouts/variations/BackendBoxed.vue";
 // import BLayoutBackendMegaMenu from "@/BusinessLayouts/variations/BackendMegaMenu.vue";
 
+//引入跳轉空頁面
+const jump = () => import("@/views/blank/jump.vue");
 // Frontend: Index
 const Index = () => import("@/views/frontend/Index.vue");
 const Login = () => import("@/views/frontend/Login.vue");
 const UserRegister = () => import("@/views/frontend/Register.vue");
-const BusinessRegister = () => import("@/views/frontend/BusinessRegister.vue");
+const MemberArea = () => import("@/views/frontend/MemberArea.vue");
+const Verification = () => import("@/views/frontend/Verification.vue");
+
 //購物車
 const ShoppingCart = () => import("@/views/frontend/ShoppingCart.vue");
 const ShoppingOrder = () => import("@/views/frontend/ShoppingOrder.vue");
 const ShoppingCheckOut = () => import("@/views/frontend/CheckOut.vue");
 const ShoppingCheckOutSuccess = () =>
   import("@/views/frontend/CheckOutSuccess.vue");
+const ShoppingCartItem = () => import("@/views/frontend/ShoppingCartItem.vue");
+
 const Post = () => import("@/views/frontend/Post.vue");
 const PostContent = () => import("@/views/frontend/PostContent.vue");
+const PostFavorite = () => import("@/views/frontend/PostFavorite.vue");
+const PostCreateFront = () => import("@/views/frontend/CreatePost.vue");
+const PostEditFront = () => import("@/views/frontend/EditPost.vue");
 const SearchRestaurant = () => import("@/views/frontend/SearchRestaurant.vue");
+const RestaurantDetails = () => import("@/views/frontend/Restaurant.vue");
 const ForumIndex = () => import("@/views/frontend/ForumIndex.vue");
+const ForumPage = () => import("@/views/frontend/ForumPage.vue");
+//Customer 商家 預訂 後台
+const BusinessRegister = () => import("@/views/frontend/BusinessRegister.vue");
 const BusinessBackend = () => import("@/views/frontend/BusinessBackend.vue");
 const BusinessProfileView = () =>
   import("@/views/frontend/businessBackend/BusinessProfileView.vue");
 const BusinessCalendar = () =>
   import("@/views/frontend/businessBackend/BusinessCalendar.vue");
+const ReserveOrder = () => import("@/views/frontend/ReserveOrder.vue");
+const ReserveDetail = () => import("@/views/frontend/ReserveDetail.vue");
 
 // Backend Boxed: Dashboard
 const BackendBoxedDashboard = () =>
@@ -54,7 +69,6 @@ const BackendDashboard = () => import("@/views/backend/DashboardView.vue");
 const VeganUsersDashboard = () =>
   import("@/views/vegan/users/DashboardView.vue");
 const VeganUsersInfo = () => import("@/views/vegan/users/UsersInfo.vue");
-//愛蔬網後台: business
 //愛蔬網後台: restaurant
 const VeganRestaurantDashboard = () =>
   import("@/views/vegan/restaurant/DashboardView.vue");
@@ -69,12 +83,13 @@ const VeganForumsForumsInfo = () =>
   import("@/views/vegan/forums/ForumsInfo.vue");
 const VeganForumsInsertForum = () =>
   import("@/views/vegan/forums/InsertForum.vue");
+
 //愛蔬網後台: posts
 const VeganPostsDashboard = () =>
   import("@/views/vegan/posts/DashboardView.vue");
 const VeganPostsPostsInfo = () => import("@/views/vegan/posts/PostsInfo.vue");
-const VeganForumsUpdatePost = () =>
-  import("@/views/vegan/posts/UpdatePost.vue");
+const VeganPostsCreatePost = () => import("@/views/vegan/posts/CreatePost.vue");
+const VeganPostsEditPost = () => import("@/views/vegan/posts/EditPost.vue");
 //愛蔬網後台: cart
 const VeganCartDashboard = () => import("@/views/vegan/cart/DashboardView.vue");
 const VeganCartProductInfo = () => import("@/views/vegan/cart/ProductInfo.vue");
@@ -88,8 +103,6 @@ const VeganImagUpload = () => import("@/views/vegan/cart/imageUpload.vue");
 const VeganReserveDashboard = () =>
   import("@/views/vegan/reserve/DashboardView.vue");
 const VeganReserveInfo = () => import("@/views/vegan/reserve/ReserveInfo.vue");
-const VeganReserveUpdatePost = () =>
-  import("@/views/vegan/reserve/UpdatePost.vue");
 
 // Backend: Blocks
 const BackendBlocksStyles = () =>
@@ -309,6 +322,16 @@ const routes = [
         component: UserRegister,
       },
       {
+        path: "/user/verification",
+        name: "Verification",
+        component: Verification,
+      },
+      {
+        path: "/memberArea",
+        name: "MemberArea",
+        component: MemberArea,
+      },
+      {
         path: "/support/store",
         name: "BusinessRegister",
         component: BusinessRegister,
@@ -335,6 +358,12 @@ const routes = [
         component: ShoppingCheckOutSuccess,
       },
       {
+        path: "/shopping/cartItem",
+        name: "shoppingCartItem",
+        component: ShoppingCartItem,
+      },
+      //食記
+      {
         path: "/post",
         name: "postIndex",
         component: Post,
@@ -345,9 +374,40 @@ const routes = [
         component: PostContent,
       },
       {
-        path: "/searchRestaurant",
+        path: "/postFavorite",
+        name: "postFavorite",
+        component: PostFavorite,
+      },
+      {
+        path: "/postCreate",
+        name: "postCreateFront",
+        component: PostCreateFront,
+      },
+      {
+        path: "/postEdit/:postId?",
+        name: "postEditFront",
+        component: PostEditFront,
+      },
+      //餐廳
+      {
+        path: "/searchRestaurant/:searchAddress?/:searchName?",
         name: "restaurantIndex",
         component: SearchRestaurant,
+      },
+      // {
+      //   path: "/searchRestaurant/:restaurantCategory?/:restaurantType?/:searchName?/:searchAddress?",
+      //   name: "restaurantIndex",
+      //   component: SearchRestaurant,
+      // },
+      {
+        path: "/searchRestaurant/details/:restaurantNumber?",
+        name: "restaurant-details",
+        component: RestaurantDetails,
+      },
+      {
+        path: "/searchRestaurant/reserve/:restaurantId?/:businessId?",
+        name: "restaurant-reserve",
+        component: ReserveOrder,
       },
       {
         path: "/business/backend/dashboard",
@@ -363,6 +423,21 @@ const routes = [
         path: "/forumIndex",
         name: "Forum-index",
         component: ForumIndex,
+      },
+      {
+        path: "/forumPage",
+        name: "Forum-page",
+        component: ForumPage,
+      },
+      {
+        path: "/jump",
+        name: "blank",
+        component: jump,
+      },
+      {
+        path: "/searchRestaurant/check",
+        name: "restaurant-reserve-check",
+        component: ReserveDetail,
       },
     ],
   },
@@ -509,9 +584,14 @@ const routes = [
             component: VeganPostsPostsInfo,
           },
           {
-            path: "update",
-            name: "backend-posts-update",
-            component: VeganForumsUpdatePost,
+            path: "create",
+            name: "backend-posts-create",
+            component: VeganPostsCreatePost,
+          },
+          {
+            path: "edit/:postId?",
+            name: "backend-posts-edit",
+            component: VeganPostsEditPost,
           },
         ],
       },
@@ -588,11 +668,6 @@ const routes = [
             path: "reserveinfo",
             name: "backend-reserve-info",
             component: VeganReserveInfo,
-          },
-          {
-            path: "update",
-            name: "backend-reserve-update",
-            component: VeganReserveUpdatePost,
           },
         ],
       },
@@ -1263,18 +1338,37 @@ router.afterEach((to, from) => {
 
 export default router;
 
-router.beforeEach((to) => {
+router.beforeEach((to, from) => {
   const admin = localStorage.getItem("access-admin"); //取admin 登入資訊
-  const business = localStorage.getItem("access-business"); //business 登入資訊
+  const business = sessionStorage.getItem("access-business"); //business 登入資訊
   const user = localStorage.getItem("access-user"); //user 登入資訊
   const isLogin = admin || business || user; //若有取得到1種就表示有登入
+
+  //如果去的元件位置 跟 來的元件位置是一樣的 ， 那就跳轉到一個專屬跳轉的空頁面
+  if (to.name === from.name) {
+    return { name: "blank" };
+  }
+
+  //如果去的頁面是空的， 用router 刷新頁面
+  if (to.name === "blank") {
+    router.go(0);
+  }
 
   if (
     !isLogin &&
     to.name !== "login" &&
     to.name !== "index" &&
     to.name !== "userRegister" &&
-    to.name !== "Forum-index"
+    to.name !== "Forum-index" &&
+    to.name !== "postIndex" &&
+    to.name !== "postPage" &&
+    to.name !== "BusinessRegister" &&
+    to.name !== "restaurantIndex" &&
+    to.name !== "restaurant-details" &&
+    to.name !== "restaurant-reserve" &&
+    to.name !== "restaurant-reserve-check" &&
+    to.name !== "shoppingCart" &&
+    to.name !== "Verification"
   ) {
     return { name: "login" };
   }

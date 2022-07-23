@@ -1,6 +1,7 @@
 package com.eeit45.champion.vegetarian.dao.impl;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -120,7 +121,7 @@ public class UserDaoImpl implements UserDao {
         //springsecurity 的 BCryptPasswordEncoder 加密, 解密(回傳boolean): bcryptPasswordEncoder.matches("使用者輸入密碼",存入資料庫密碼)
         map.put("password", new BCryptPasswordEncoder().encode(userRequest.getPassword()));
         map.put("userName", userRequest.getUserName());
-        map.put("status", "正常");
+        map.put("status", "禁用");
         map.put("userPic", userRequest.getUserPic());
         
         //日期處理
@@ -238,6 +239,40 @@ public class UserDaoImpl implements UserDao {
 		return pw;
 	}
 	
+	@Override
+	public int updateImage(String base64DataString, int id) {
+		String sql = "UPDATE vegandb.user SET userPic= :userPic WHERE userId= :userId";
+		
+		Map<String, Object> map = new HashMap<>();
+		map.put("userPic", base64DataString);
+		map.put("userId", id);
+		
+		return namedParameterJdbcTemplate.update(sql, map);
+		
+	}
+	
+	@Override
+	public int updateUserName(String name, int id) {
+		String sql = "UPDATE vegandb.user SET userName= :userName WHERE userId= :userId";
+		
+		Map<String, Object> map = new HashMap<>();
+		map.put("userName", name);
+		map.put("userId", id);
+		
+		return namedParameterJdbcTemplate.update(sql, map);
+	}
+	
+	@Override
+	public int updatePassword(String password, String newPassword, int id) {
+		String sql = "UPDATE `user` SET password = :password where userId= :userId";
+		
+		Map<String, Object> map = new HashMap<>();
+		map.put("password", new BCryptPasswordEncoder().encode(newPassword));
+		map.put("userId", id);
+		
+		return namedParameterJdbcTemplate.update(sql, map);
+	}
+	
 	private String filteringSQL(String sql, Map<String, Object> map, UserQueryParams userQueryParams) {
 		
 		if (userQueryParams.getSearch() != null) {
@@ -246,5 +281,95 @@ public class UserDaoImpl implements UserDao {
 		}
 		return sql;
 	}
+
+	@Override
+	public Integer countUser() {
+		
+		String sql = "select count(*) from `user`";
+		
+		Map<String, Object> map = new HashMap<>();
+
+        Integer count = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class);
+		
+        return count;
+        
+	}
+
+	@Override
+	public Integer countRegister() {
+
+		String sql = "select count(*) from `user` where registerTime between :oneDay and :today";
+		
+		LocalDate today = LocalDate.now();
+		
+		LocalDate oneDay = today.minusDays(90);
+		
+		Map<String, Object> map = new HashMap<>();
+		
+		map.put("oneDay", oneDay);
+		
+		map.put("today", today);
+
+        Integer count = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class);
+		
+        return count;
+		
+	}
+
+	@Override
+	public Integer countLogin() {
+		
+		String sql = "select count(*) from `user` where lastLoginTime between :oneDay and :today";
+		
+		LocalDate today = LocalDate.now();
+		
+		LocalDate oneDay = today.minusDays(90);
+		
+		Map<String, Object> map = new HashMap<>();
+		
+		map.put("oneDay", oneDay);
+		
+		map.put("today", today);
+
+        Integer count = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class);
+		
+        return count;
+		
+	}
+
+	@Override
+	public Double countPercentLogin() {
+		
+		String sql = "select (select count(*) from `user` where lastLoginTime between :oneDay and :today) / (select count(*) from `user`)";
+		
+		LocalDate today = LocalDate.now();
+		
+		LocalDate oneDay = today.minusDays(30);
+		
+		Map<String, Object> map = new HashMap<>();
+		
+		map.put("oneDay", oneDay);
+		
+		map.put("today", today);
+
+		Double  count = namedParameterJdbcTemplate.queryForObject(sql, map, Double .class);
+		
+        return count;
+		
+	}
+
+	@Override
+	public int updateStatus(String status, String email) {
+
+		String sql = "UPDATE vegandb.user SET status= :status WHERE email= :email";
+		
+		Map<String, Object> map = new HashMap<>();
+		map.put("status", status);
+		map.put("email", email);
+		
+		return namedParameterJdbcTemplate.update(sql, map);
+	
+	}
+
 
 }

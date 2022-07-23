@@ -27,12 +27,17 @@ public class Post {
 	private String postStatus;
 
 	private Date postAuditDate;
+	
+	private Date postUpdateDate;
 
 	private String postCategory;
 	
 	private Integer likeCount;
+	
+	private Integer userId;
 
-//	    private MultipartFile postImage;
+
+	
 
 	
 
@@ -124,13 +129,7 @@ public class Post {
 		this.imgurl = imgurl;
 	}
 
-//		public MultipartFile getPostImage() {
-//			return postImage;
-//		}
-//
-//		public void setPostImage(MultipartFile postImage) {
-//			this.postImage = postImage;
-//		}
+
 
 	public String getPostStatus() {
 		return postStatus;
@@ -163,21 +162,23 @@ public class Post {
 	public void setLikeCount(Integer likeCount) {
 		this.likeCount = likeCount;
 	}
+	
+	public Date getPostUpdateDate() {
+		return postUpdateDate;
+	}
 
-//		public PostSataus getPostSataus() {
-//			return postSataus;
-//		}
-//
-//		public void setPostSataus(PostSataus postSataus) {
-//			this.postSataus = postSataus;
-//		}
+	public void setPostUpdateDate(Date postUpdateDate) {
+		this.postUpdateDate = postUpdateDate;
+	}
 
-//		public Integer getPostSatausId() {
-//			return postSatausId;
-//		}
-//
-//		public void setPostSatausId(Integer postSatausId) {
-//			this.postSatausId = postSatausId;
-//		}
+	public Integer getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Integer userId) {
+		this.userId = userId;
+	}
+
+
 
 }

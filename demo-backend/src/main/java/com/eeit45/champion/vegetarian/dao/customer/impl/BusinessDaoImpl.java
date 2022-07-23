@@ -2,16 +2,20 @@ package com.eeit45.champion.vegetarian.dao.customer.impl;
 
 import com.eeit45.champion.vegetarian.dao.customer.BusinessDao;
 import com.eeit45.champion.vegetarian.dto.customer.BusinessRegisterRequest;
+import com.eeit45.champion.vegetarian.dto.customer.BusinessRequest;
 import com.eeit45.champion.vegetarian.model.customer.Business;
 import com.eeit45.champion.vegetarian.model.customer.Pos;
 import com.eeit45.champion.vegetarian.rowmapper.customer.BusinessRowMapper;
 import com.eeit45.champion.vegetarian.rowmapper.customer.PosRowMapper;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -115,5 +119,39 @@ public class BusinessDaoImpl implements BusinessDao {
         if(businessList != null) return businessList;
 
         return null;
+    }
+
+    @Override
+    public void updateRestaurantNumber(Integer businessId, BusinessRequest businessRequest) {
+        String sql = "UPDATE business SET restaurantNumber = :restaurantNumber , updateTime = :updateTime " +
+                " WHERE businessId = :businessId  " ;
+
+
+        Map<String , Object > map = new HashMap<>();
+        map.put("restaurantNumber",businessRequest.getRestaurantNumber());
+
+        Date now = new Date();
+        Timestamp timestamp = new Timestamp(now.getTime());
+        map.put("updateTime", timestamp);
+
+        map.put("businessId" , businessId);
+
+        namedParameterJdbcTemplate.update(sql,map);
+    }
+
+    @Override
+    public String resetPassword(String email) {
+        String sql = "UPDATE business SET password = :password where email= :email";
+
+        //亂數生成8位數
+        String rsu = RandomStringUtils.random(8,true,true);
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("password",DigestUtils.md5DigestAsHex(rsu.getBytes()));
+        map.put("email", email);
+
+        namedParameterJdbcTemplate.update(sql, map);
+
+        return rsu;
     }
 }

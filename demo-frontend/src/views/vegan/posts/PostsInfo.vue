@@ -2,8 +2,9 @@
 import { ref, reactive, computed, onMounted } from "vue";
 // Sweetalert2, for more info and examples, you can check out https://github.com/sweetalert2/sweetalert2
 import Swal from "sweetalert2";
-
+import "bootstrap-icons/font/bootstrap-icons.css";
 import axios from "axios";
+import { useRouter } from "vue-router";
 
 // Vue Dataset, for more info and examples you can check out https://github.com/kouts/vue-dataset/tree/next
 import {
@@ -35,8 +36,9 @@ var resData = ref();
 const resPostId = ref();
 const resPostTitle = ref();
 const resPostText = ref();
+const resPostCategory = ref();
 const resPostStatus = ref("待審核");
-const statusClass = [];
+const router = useRouter();
 
 const getAxios = function () {
   axios
@@ -45,17 +47,17 @@ const getAxios = function () {
       // console.log(res);
 
       // 獲取伺服器的回傳資料;
-      res.data.forEach((value) => {
-        let status = value.postStatus;
-        // console.log(status);
-        if (status === "待審核") {
-          statusClass.push("warning");
-        } else if (status === "發布中") {
-          statusClass.push("success");
-        } else if (status === "未通過") {
-          statusClass.push("danger");
-        }
-      });
+      // res.data.forEach((value) => {
+      //   let status = value.postStatus;
+      //   // console.log(status);
+      //   if (status === "待審核") {
+      //     statusClass.push("warning");
+      //   } else if (status === "發布中") {
+      //     statusClass.push("success");
+      //   } else if (status === "未通過") {
+      //     statusClass.push("danger");
+      //   }
+      // });
       resData.value = res.data;
     })
     .catch((error) => {
@@ -72,6 +74,11 @@ getAxios();
 //在這邊去設定Table :th的欄位名稱
 const cols = reactive([
   {
+    name: "發布者ID",
+    field: "userId",
+    sort: "",
+  },
+  {
     name: "文章名稱",
     field: "title",
     sort: "",
@@ -84,6 +91,11 @@ const cols = reactive([
   {
     name: "發表日期",
     field: "postedDate",
+    sort: "",
+  },
+  {
+    name: "上次更新日期",
+    field: "postUpdateDate",
     sort: "",
   },
   {
@@ -185,6 +197,7 @@ function auditPost(number) {
       resPostId.value = res.data.postId;
       resPostTitle.value = res.data.title;
       resPostText.value = res.data.postedText;
+      resPostCategory.value = res.data.postCategory;
     })
     .catch((error) => {
       console.log(error, "失敗");
@@ -230,9 +243,9 @@ function sendAuditPost(number, status) {
             console.log(res);
             getAxios();
             //重整頁面(先解決審核的顏色一定要刷新頁面才會更改的問題&不能自己關的modal)
-            window.setTimeout(function () {
-              location.reload();
-            }, 1000);
+            // window.setTimeout(function () {
+            //   location.reload();
+            // }, 1000);
           })
 
           .catch((error) => {
@@ -242,23 +255,12 @@ function sendAuditPost(number, status) {
     });
 }
 
-// //送出審核文章
-// function sendAuditPost(number, status) {
-//   // var data = {postStatus = status};
-//   // axios({
-//   //   method: "put",
-//   //   baseURL: "http://localhost:8088",
-//   //   url: `http://${url}/auditPost/${number}`,
-//   //   headers: {
-//   //     "content-type": "application/x-www-form-urlencoded;charset=utf-8",
-//   //   },
-//   // })
-//   //   .then((result) => {
-//   //     console.log(result.data);
-//   //   })
-//   //   .catch((err) => {
-//   //     console.error(err);
-//   //   });
+//跳到編輯頁面
+function findPost(id) {
+  //send request to server
+  console.log(id);
+  router.push({ name: "backend-posts-edit", params: { postId: id } });
+}
 
 //發布中文章(篩選器)
 function frontPost() {
@@ -383,8 +385,17 @@ th.sort {
           </li>
         </ol>
       </nav>
+      <br />
+      <div>
+        <router-link to="./create">
+          <button type="button" class="btn btn-primary float-end">
+            發表文章
+          </button>
+        </router-link>
+      </div>
     </template>
   </BasePageHeading>
+
   <!-- END Hero -->
 
   <!-- Page Content -->
@@ -410,7 +421,13 @@ th.sort {
               aria-labelledby="dropdown-recent-orders-filters"
             >
               <a
-                class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                class="
+                  dropdown-item
+                  fw-medium
+                  d-flex
+                  align-items-center
+                  justify-content-between
+                "
                 href="#"
                 @click.prevent="notaudit()"
               >
@@ -418,7 +435,13 @@ th.sort {
                 <span class="badge bg-primary rounded-pill"></span>
               </a>
               <a
-                class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                class="
+                  dropdown-item
+                  fw-medium
+                  d-flex
+                  align-items-center
+                  justify-content-between
+                "
                 href="#"
                 @click.prevent="frontPost()"
               >
@@ -426,7 +449,13 @@ th.sort {
                 <span class="badge bg-primary rounded-pill"></span>
               </a>
               <a
-                class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                class="
+                  dropdown-item
+                  fw-medium
+                  d-flex
+                  align-items-center
+                  justify-content-between
+                "
                 href="#"
                 @click.prevent="notPassPost()"
               >
@@ -434,7 +463,13 @@ th.sort {
                 <span class="badge bg-primary rounded-pill"></span>
               </a>
               <a
-                class="dropdown-item fw-medium d-flex align-items-center justify-content-between"
+                class="
+                  dropdown-item
+                  fw-medium
+                  d-flex
+                  align-items-center
+                  justify-content-between
+                "
                 href="#"
                 data-rel="all"
                 @click.prevent="getAxios"
@@ -450,7 +485,14 @@ th.sort {
         v-slot="{ ds }"
         :ds-data="resData"
         :ds-sortby="sortBy"
-        :ds-search-in="['postStatus', 'title', 'postedDate', 'postedText']"
+        :ds-search-in="[
+          'userId',
+          'postStatus',
+          'title',
+          'postedDate',
+          'postedText',
+          'postUpdateDate',
+        ]"
       >
         <div class="row" :data-page-count="ds.dsPagecount">
           <div class="col-md-3 py-2">
@@ -481,21 +523,78 @@ th.sort {
                       {{ th.name }} <i class="gg-select float-end"></i>
                     </th>
                     <th class="text-center" style="width: 100px">審核</th>
+                    <th class="text-center" style="width: 100px">編輯</th>
                   </tr>
                 </thead>
                 <DatasetItem tag="tbody" class="fs-sm">
-                  <template #default="{ row, rowIndex }">
+                  <template #default="{ row }">
                     <tr style="line-height: 5px">
                       <th scope="row">{{ row.postId }}</th>
                       <td
                         class="d-none d-sm-table-cell"
                         style="min-width: 100px"
                       >
-                        <span
+                        <!-- <span
                           :class="`fs-xs fw-semibold d-inline-block py-1 px-3 rounded-pill bg-${statusClass[rowIndex]}-light text-${statusClass[rowIndex]}`"
                           id="combo"
                           >{{ row.postStatus }}</span
+                        > -->
+                        <span
+                          v-if="row.postStatus == '待審核'"
+                          class="
+                            fs-xs
+                            fw-semibold
+                            d-inline-block
+                            py-1
+                            px-3
+                            rounded-pill
+                            bg-warning-light
+                            text-warning
+                          "
                         >
+                          {{ row.postStatus }}
+                        </span>
+                        <span
+                          v-if="row.postStatus == '發布中'"
+                          class="
+                            fs-xs
+                            fw-semibold
+                            d-inline-block
+                            py-1
+                            px-3
+                            rounded-pill
+                            bg-warning-light
+                            text-info
+                          "
+                        >
+                          {{ row.postStatus }}
+                        </span>
+                        <span
+                          v-if="row.postStatus == '未通過'"
+                          class="
+                            fs-xs
+                            fw-semibold
+                            d-inline-block
+                            py-1
+                            px-3
+                            rounded-pill
+                            bg-warning-light
+                            text-danger
+                          "
+                        >
+                          {{ row.postStatus }}
+                        </span>
+                      </td>
+                      <td
+                        class="text-center"
+                        style="
+                          overflow: hidden;
+                          white-space: nowrap;
+                          text-overflow: ellipsis;
+                          max-width: 150px;
+                        "
+                      >
+                        {{ row.userId }}
                       </td>
                       <td
                         class="text-center"
@@ -521,9 +620,15 @@ th.sort {
                       </td>
                       <td
                         class="d-none d-sm-table-cell"
-                        style="min-width: 180px"
+                        style="min-width: 170px"
                       >
                         {{ row.postedDate }}
+                      </td>
+                      <td
+                        class="d-none d-sm-table-cell"
+                        style="min-width: 170px"
+                      >
+                        {{ row.postUpdateDate }}
                       </td>
                       <td
                         class="d-none d-sm-table-cell"
@@ -531,10 +636,14 @@ th.sort {
                           overflow: hidden;
                           white-space: nowrap;
                           text-overflow: ellipsis;
-                          max-width: 150px;
+                          min-width: 150px;
                         "
                       >
-                        <img :src="row.imgurl" class="img-thumbnail" alt="...">
+                        <img
+                          :src="row.imgurl"
+                          class="img-thumbnail"
+                          alt="..."
+                        />
                       </td>
 
                       <td class="text-center">
@@ -545,6 +654,17 @@ th.sort {
                             data-bs-toggle="modal"
                             data-bs-target="#auditPost"
                             @click="auditPost(row.postId)"
+                          >
+                            <i class="bi bi-clipboard-check"></i>
+                          </button>
+                        </div>
+                      </td>
+                      <td class="text-center">
+                        <div class="btn-group">
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-alt-secondary"
+                            @click="findPost(row.postId)"
                           >
                             <i class="fa fa-fw fa-pencil-alt"></i>
                           </button>
@@ -565,7 +685,12 @@ th.sort {
           </div>
         </div>
         <div
-          class="d-flex flex-md-row flex-column justify-content-between align-items-center"
+          class="
+            d-flex
+            flex-md-row flex-column
+            justify-content-between
+            align-items-center
+          "
         >
           <DatasetInfo class="py-3 fs-sm" />
           <DatasetPager class="flex-wrap py-3 fs-sm" />
@@ -608,6 +733,21 @@ th.sort {
                   </div>
                   <div class="mb-3">
                     <label for="exampleFormControlInput1" class="form-label"
+                      >文章分類</label
+                    ><br />
+                    <textarea
+                      type="textarea"
+                      class="form-control"
+                      id="exampleFormControlInput1"
+                      style="resize: none"
+                      disabled
+                      readonly
+                      rows="1"
+                      v-model="resPostCategory"
+                    ></textarea>
+                  </div>
+                  <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label"
                       >文章標題</label
                     >
                     <textarea
@@ -625,15 +765,16 @@ th.sort {
                     <label for="exampleFormControlTextarea1" class="form-label"
                       >文章內文</label
                     >
-                    <textarea
+                    <div
+                      type="textarea"
                       class="form-control"
                       id="exampleFormControlTextarea1"
                       rows="12"
                       style="resize: none"
                       disabled
                       readonly
-                      v-model="resPostText"
-                    ></textarea>
+                      v-html="resPostText"
+                    ></div>
                   </div>
                   <div class="auditselect">
                     <select

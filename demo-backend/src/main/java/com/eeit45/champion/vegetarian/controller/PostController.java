@@ -2,13 +2,11 @@ package com.eeit45.champion.vegetarian.controller;
 
 import java.io.*;
 
-import com.eeit45.champion.vegetarian.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.eeit45.champion.vegetarian.model.Post;
 import com.eeit45.champion.vegetarian.model.PostFavorite;
@@ -43,36 +41,14 @@ public class PostController {
 
 	// 發表食記
 	@PostMapping("/PostNew")
-	public ResponseEntity<Boolean> createPostImage(@RequestParam(value = "title") String title,
-			@RequestParam(value = "postedText") String postedText,
-			@RequestPart(value = "postImage") MultipartFile postImage, Post post, HttpServletRequest request)
-			throws IOException {
+	public ResponseEntity<Boolean> createPostImage(Post post) throws IOException {
 
 		String imageUrl = null;
-		String fileFolderName = "testimages/PostsPhoto";
-		String defaultImgurl = "images/PostsPhoto/defaultPostImage.jpg";
 
-		if (postImage.getSize() != 0) {
-			// byte[] bytes = picture.getBytes();
-			String filename = postImage.getOriginalFilename();
-			String suffix = filename.substring(filename.lastIndexOf('.'));// 副檔名
-			String newFileName = new Date().getTime() + suffix;// 新的檔名
-
-			String saveDir = request.getSession().getServletContext().getRealPath("/") + fileFolderName;
-			File saveFileDir = new File(saveDir);
-
-			if (!saveFileDir.exists()) {
-				saveFileDir.mkdirs();
-			}
-			System.out.println(saveDir);
-
-			imageUrl = fileFolderName + "/" + newFileName; // 儲存資料庫路徑
-			System.out.println(imageUrl);
-			File headImage = new File(saveDir, newFileName);
-			postImage.transferTo(headImage);
-
+		if (!post.getImgurl().isEmpty()) {
+			imageUrl = post.getImgurl();
 		} else {
-			imageUrl = defaultImgurl;
+			imageUrl = "http://localhost:8088/defaultPostImg.jpg";
 		}
 
 		ZoneId zoneId = ZoneId.systemDefault();
@@ -80,11 +56,10 @@ public class PostController {
 		ZonedDateTime zdt = localDateTime.atZone(zoneId);
 		Date date = Date.from(zdt.toInstant());
 
-		post.setTitle(title);
-		post.setPostedText(postedText);
 		post.setImgurl(imageUrl);
 		post.setPostedDate(date);
 		post.setPostStatus("待審核");
+		post.setPostUpdateDate(date);
 
 		Boolean addresult = postService.addPostImage(post);
 		return ResponseEntity.status(HttpStatus.CREATED).body(addresult);
@@ -247,18 +222,43 @@ public class PostController {
 
 	}
 
-	// 與@GetMapping("/auditPost/{id}") 方法重複
-	// 查詢單筆文章
-//	@GetMapping(value = "/showPost/{id}")
-//	public ResponseEntity<Post> showPost(@PathVariable("id") int id,HttpServletRequest request) {
-//
-//		Post post = postService.findPost(id);
-//		if (post != null) {
-//			return ResponseEntity.status(HttpStatus.OK).body(post);
-//		} else {
-//			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-//		}
-//	}
+	// 依使用者查詢自己發布的文章
+	@GetMapping(value = "/showPost/{userId}")
+	public ResponseEntity<List<Post>> showUserPost(@PathVariable("userId") Integer userId, HttpServletRequest request) {
+
+		List<Post> post = postService.findPostByUser(userId);
+		if (post != null) {
+			return ResponseEntity.status(HttpStatus.OK).body(post);
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+	}
+
+	// 依使用者查詢自己發布的文章(待審核)
+	@GetMapping(value = "/showPostNoAudit/{userId}")
+	public ResponseEntity<List<Post>> showUserPostNoAudit(@PathVariable("userId") Integer userId,
+			HttpServletRequest request) {
+
+		List<Post> post = postService.findPostByUserNoAudit(userId);
+		if (post != null) {
+			return ResponseEntity.status(HttpStatus.OK).body(post);
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+	}
+
+	// 依使用者查詢自己發布的文章(未通過)
+	@GetMapping(value = "/showPostNoPass/{userId}")
+	public ResponseEntity<List<Post>> showUserPostNoPass(@PathVariable("userId") Integer userId,
+			HttpServletRequest request) {
+
+		List<Post> post = postService.findPostByUserNoPass(userId);
+		if (post != null) {
+			return ResponseEntity.status(HttpStatus.OK).body(post);
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+	}
 
 	// 刪除文章
 	@GetMapping(value = "/deletePost/{id}")
@@ -285,35 +285,19 @@ public class PostController {
 
 	@PostMapping(path = "/editPost/{id}")
 	public ResponseEntity<Boolean> UpdatePostImage(@RequestParam(value = "title") String title,
+			@RequestParam(value = "postImgurl") String postImgurl,
 			@RequestParam(value = "postedText") String postedText,
-			@RequestPart(value = "postImage") MultipartFile postImage, @PathVariable("id") int id, Post post,
-			HttpServletRequest request) throws IOException {
-		String imageUrl = post.getImgurl();
-		String fileFolderName = "testimages/PostsPhoto";
-		String defaultImgurl = "images/PostsPhoto/defaultPostImage.jpg";
+			@RequestParam(value = "postCategory") String postCategory, @PathVariable("id") Integer id, Post post)
+			throws IOException {
 
-		if (postImage.getSize() != 0) {
-			// byte[] bytes = picture.getBytes();
-			String filename = postImage.getOriginalFilename();
-			String suffix = filename.substring(filename.lastIndexOf('.'));// 副檔名
-			String newFileName = new Date().getTime() + suffix;// 新的檔名
+		String imageUrl = null;
 
-			String saveDir = request.getSession().getServletContext().getRealPath("/") + fileFolderName;
-			File saveFileDir = new File(saveDir);
-
-			if (!saveFileDir.exists()) {
-				saveFileDir.mkdirs();
-			}
-			System.out.println(saveDir);
-
-			imageUrl = fileFolderName + "/" + newFileName; // 儲存資料庫路徑
-			System.out.println(imageUrl);
-			File headImage = new File(saveDir, newFileName);
-			postImage.transferTo(headImage);
-
+		if (!postImgurl.isBlank()) {
+			imageUrl = postImgurl;
 		} else {
-			imageUrl = defaultImgurl;
+			imageUrl = "http://localhost:8088/defaultPostImg.jpg";
 		}
+
 		ZoneId zoneId = ZoneId.systemDefault();
 		LocalDateTime localDateTime = LocalDateTime.now();
 		ZonedDateTime zdt = localDateTime.atZone(zoneId);
@@ -323,7 +307,7 @@ public class PostController {
 		post.setTitle(title);
 		post.setPostedText(postedText);
 		post.setImgurl(imageUrl);
-		post.setPostedDate(date);
+		post.setPostUpdateDate(date);
 		post.setPostStatus("待審核");
 
 		Boolean addresult = postService.updatePost(post);
@@ -343,6 +327,32 @@ public class PostController {
 		}
 	}
 
+	// 依讚數排序搜尋
+	@GetMapping(value = "/findlike")
+	public ResponseEntity<List<Post>> showlikeCount() {
+
+		List<Post> post = postService.findPostbyLike();
+		// boolean out = false;
+		if (post != null) {
+			return ResponseEntity.status(HttpStatus.OK).body(post);
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+	}
+
+	// 顯示使用者收藏文章
+	@GetMapping(value = "/favoritePost/{userId}")
+	public ResponseEntity<List<Post>> showfavPost(@PathVariable("userId") Integer userId) {
+
+		List<Post> post = postService.findFavoritePost(userId);
+		List<Post> out = null;
+		if (post != null) {
+			return ResponseEntity.status(HttpStatus.OK).body(post);
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body(out);
+		}
+	}
+
 	// 搜尋按讚文章
 	@GetMapping(value = "/liketest/{id}/{userId}")
 	public ResponseEntity<Boolean> showlike(@PathVariable("id") Integer id, @PathVariable("userId") Integer userId) {
@@ -356,7 +366,7 @@ public class PostController {
 		}
 	}
 
-	//取消收藏
+	// 取消收藏
 	@DeleteMapping(value = "/favtest/{id}/{userId}")
 	public ResponseEntity<Boolean> delfav(@PathVariable("id") Integer id, @PathVariable("userId") Integer userId) {
 
@@ -388,7 +398,8 @@ public class PostController {
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
 	}
-	//取消按讚
+
+	// 取消按讚
 	@DeleteMapping(value = "/liketest/{id}/{userId}")
 	public ResponseEntity<Boolean> dellike(@PathVariable("id") Integer id, @PathVariable("userId") Integer userId) {
 

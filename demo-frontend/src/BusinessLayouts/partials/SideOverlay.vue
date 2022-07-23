@@ -49,7 +49,10 @@ onUnmounted(() => {
   document.removeEventListener("keydown", eventSideOverlay);
 });
 
-const business = JSON.parse(window.localStorage.getItem("access-business"));
+const business = JSON.parse(window.sessionStorage.getItem("access-business"));
+if (business.data.business.businessPic == null) {
+  business.data.business.businessPic = "avatar"
+}
 </script>
 
 <template>
@@ -120,7 +123,7 @@ const business = JSON.parse(window.localStorage.getItem("access-business"));
                             <div class="fw-semibold">{{ appEvent.title }}</div>
                             <div>{{ appEvent.subtitle }}</div>
                             <small class="text-muted">{{
-                            appEvent.time
+                                appEvent.time
                             }}</small>
                           </div>
                         </a>

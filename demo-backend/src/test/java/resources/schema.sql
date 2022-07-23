@@ -8,9 +8,9 @@ CREATE TABLE `user`(
                        password nvarchar(128) not null,
                        userName nvarchar(64) not null,
                        status nvarchar (32) not null,
-                       userPic nvarchar(64),
+                       userPic LONGTEXT,
                        registerTime DATE not null ,
-                       lastLoginTime TIMESTAMP not null
+                       lastLoginTime TIMESTAMP
 );
 
 -- business
@@ -27,6 +27,7 @@ CREATE TABLE business(
                          businessPic nvarchar(64),
                          status nvarchar (32) not null,
                          UUID nvarchar(256) ,
+                         restaurantNumber int ,
                          createdTime TIMESTAMP not null ,
                          lastLoginTime TIMESTAMP not null,
                          updateTime  TIMESTAMP not null
@@ -164,6 +165,15 @@ create table restaurant(
                        updatedTime TIMESTAMP NOT NULL
 );
 
+-- saveRestaurant
+drop table if exists saveRestaurant;
+CREATE TABLE saveRestaurant(
+                     userId int NOT NULL,
+                     restaurantNumber int NOT NULL,
+                     saveDate DATETIME NOT NULL
+                    
+);
+
 -- post
 drop table if exists post;
 CREATE TABLE post(
@@ -174,8 +184,10 @@ CREATE TABLE post(
                      imgUrl NVARCHAR(256),
                      postStatus NVARCHAR(256),
                      postAuditDate DATETIME,
+                     postUpdateDate DATETIME,
                      postCategory NVARCHAR(256),
-                     likeCount INT default 0
+                     likeCount INT default 0,
+                     userId INT
 );
 
 -- favorite post

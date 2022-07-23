@@ -1,7 +1,9 @@
 <script setup>
 // 已經宣告但從未使用過的Value (請勿刪除)
-import { ref } from "vue";
+import { useTemplateStore } from "@/stores/template";
+import { computed, ref } from "vue";
 import axios from "axios";
+import Swal from "sweetalert2";
 //預設傳值伺服器與[params]
 const url = "localhost:8088";
 const urlParams = ref(
@@ -13,6 +15,9 @@ const urlParams = ref(
     search: null
   }
 );
+
+// Main store
+const store = useTemplateStore();
 //接收的資料ref
 const resData = ref();
 const productsTotal = ref();
@@ -27,7 +32,6 @@ const singleProduct = ref(
 )
 
 const getAxios = function () {
-  console.log(urlParams)
   axios
     .get(`http://${url}/products`, { params: urlParams.value })
     .then((res) => {
@@ -46,16 +50,50 @@ function getSingle(productId) {
     .get(`http://${url}/products/${productId}`)
     .then((res) => {
       singleProduct.value = res.data
-      console.log(singleProduct)
-    })
+    }).catch((error) => {
+      console.log(error, "失敗");
+    });
 
 
 }
 // 執行Axios;
 getAxios();
-// For Filters
+//購物車
 
+const data = (localStorage.getItem('cartItem')) ? JSON.parse(localStorage.getItem('cartItem')) : {
+  cartItemList: []
+};
 
+const cartItem = ref({
+  quantity: "",
+})
+
+function addToCart(productId) {
+  if (singleProduct.value.stock < this.cartItem.quantity) {
+    Swal.fire(
+      {
+        title: "超出庫存",
+        text: "",
+        timer: 1500,
+        icon: "warning"
+      }
+    )
+  } else {
+    cartItem.value.product = singleProduct.value
+    cartItem.value.quantity = this.cartItem.quantity
+    data.cartItemList.push(cartItem.value);
+    localStorage.setItem('cartItem', JSON.stringify(data));
+    console.log(data)
+    Swal.fire(
+      {
+        title: "已加入購物車",
+        text: "",
+        timer: 1500,
+        icon: "success"
+      }
+    )
+  }
+}
 </script>
 <template>
   <!-- Hero -->
@@ -104,10 +142,6 @@ getAxios();
 
   <div class="row">
     <BaseBlock>
-      <img
-        src="https://cms.cdn.91app.com/images/original/12557/481fb4bf-120e-42de-b3a6-9b2d0bfc55ef-1551854036-no8pq90hxv.png"
-        alt="" class="d-inline" />
-
       <img
         src="  https://cms.cdn.91app.com/images/original/12557/481fb4bf-120e-42de-b3a6-9b2d0bfc55ef-1585213936-x05bo61xos_m.png"
         alt="" class="d-inline" />
@@ -266,14 +300,6 @@ getAxios();
           </div>
 
           <div class="form-check form-block">
-            <input type="radio" class="form-check-input" id="category5" name="category" value="飾品"
-              v-model="urlParams.category" @change="getAxios()" />
-            <label class="form-check-label" for="category5">
-              <span class="fs-4 fw-semibold">飾品</span>
-            </label>
-          </div>
-
-          <div class="form-check form-block">
             <input type="radio" class="form-check-input" id="category6" name="category" value="保健"
               v-model="urlParams.category" @change="getAxios()" />
             <label class="form-check-label" for="category6">
@@ -366,21 +392,22 @@ getAxios();
                     }}</span>
                   </div>
                   <div v-else>
-                    <span class="badge bg-danger"><i class="fa fa-times-circle"></i> 已無商品</span>
+                    <span class="badge bg-danger"><i class="fa fa-times-circle"></i> 商品已售完</span>
                   </div>
                   <!-- 購物車按鈕 -->
                 </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn 
-btn-outline-danger" data-bs-dismiss="modal">
-                    <i class="far fa-heart">收藏</i>
-                  </button>
-                  <button type="submit" class="btn btn-outline-primary" data-bs-dismiss="modal">
+
+
+                <div v-if="item.stock > 0">
+                  <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#showProduct"
+                    @click="getSingle(item.productId)">
                     <i class="fa fa-cart-shopping">加入購物車</i>
                   </button>
                 </div>
+
               </div>
             </div>
+
           </template>
         </BaseBlock>
 
@@ -453,36 +480,52 @@ btn-outline-danger" data-bs-dismiss="modal">
               }}</span>
             </div>
             <div v-else>
-              <span class="badge bg-danger"><i class="fa fa-times-circle"></i> 已無商品</span>
+              <span class="badge bg-danger"><i class="fa fa-times-circle"></i> 商品已售完</span>
             </div>
           </div>
-          <!-- 下拉顯示選單 -->
-          <BaseBlock :title="`  商品詳細描述 `" btn-option-content>
-            <template #subtitle>
-              <!-- 這裡可以放副標題 -->
-            </template>
-            <div class="row items-push-2x text-center">
-              <!-- 這裡會顯示商品的詳細描述 -->
-              <div v-html="singleProduct.description">
-              </div>
+
+
+          <div>
+            <div v-if="singleProduct.stock > 1">
+              <input type="number" min="1" v-model="cartItem.quantity" />
+              &ensp;&ensp;
+              <button type="submit" class="btn btn-outline-primary" data-bs-dismiss="modal"
+                @click="addToCart(singleProduct.productId)">
+                <i class="fa fa-cart-shopping">加入購物車</i>
+              </button>
             </div>
-          </BaseBlock>
-
+          </div>
         </div>
-        <!-- 表單內文在這裡結束 -->
-        <!-- 送出button -->
-        <div class="modal-footer">
-          <button type="button" class="btn 
-btn-outline-danger" data-bs-dismiss="modal">
-            <i class="far fa-heart">收藏</i>
-          </button>
-          &ensp;&ensp;&ensp;
-          <button type="submit" class="btn btn-outline-primary" data-bs-dismiss="modal">
-            <i class="fa fa-cart-shopping">加入購物車</i>
-          </button>
+        <!-- 下拉顯示選單 -->
+        <BaseBlock :title="`  商品詳細描述 `" btn-option-content>
+          <template #subtitle>
+            <!-- 這裡可以放副標題 -->
+          </template>
+          <div class="row items-push-2x text-center">
+            <!-- 這裡會顯示商品的詳細描述 -->
+            <div v-html="singleProduct.description">
+            </div>
+          </div>
+        </BaseBlock>
 
-        </div>
       </div>
+      <!-- 表單內文在這裡結束 -->
+
     </div>
   </div>
+  <!-- Footer -->
+  <footer id="page-footer" class="bg-body-light">
+    <div class="content py-5">
+      <div class="row fs-sm fw-medium">
+        <div class="col-sm-6 order-sm-2 py-1 text-center text-sm-end"> 本網站僅作為 <i class="fa fa-heart text-danger"></i>
+          <a class="fw-semibold" href="https://www.ispan.com.tw/" target="_blank">資展國際</a>專題使用
+        </div>
+        <div class="col-sm-6 order-sm-1 py-1 text-center text-sm-start"><a class="fw-semibold"
+            href="https://github.com/Ryan-focus/springboot-vegetarian"> EEIT45 - 跨域JAVA班 - 第一組 </a> © {{
+                store.app.copyright
+            }}</div>
+      </div>
+    </div>
+  </footer>
+  <!-- END Footer -->
 </template>

@@ -5,7 +5,7 @@ import { useTemplateStore } from "@/stores/template";
 import Swal from "sweetalert2";
 
 // Grab example data
-import notifications from "@/data/notifications";
+// import notifications from "@/data/notifications";
 
 
 // Main store and Router
@@ -41,10 +41,7 @@ onUnmounted(() => {
 //登出
 function logout() {
   // this.admin = null;
-  store.getStates({ business: "" });
-  localStorage.removeItem("access-admin");
-  localStorage.removeItem("access-business");
-  localStorage.removeItem("access-user");
+  sessionStorage.removeItem("access-business");
   location.replace("http://localhost:8080/#/"); //登出後防止返回上頁
   Swal.fire({
     title: "您已登出",
@@ -57,8 +54,10 @@ function logout() {
     router.go(0)
   }, 200);
 }
-const business = JSON.parse(window.localStorage.getItem("access-business"));
-console.log(business.data.business);
+const business = JSON.parse(window.sessionStorage.getItem("access-business"));
+if (business.data.business.businessPic == null) {
+  business.data.business.businessPic = "avatar"
+}
 </script>
 
 <template>
@@ -126,7 +125,7 @@ console.log(business.data.business);
                 <button type="button" class="btn btn-sm btn-alt-secondary d-flex align-items-center"
                   id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <img class="rounded-circle" :src="`/assets/media/business/${business.data.business.businessPic}.jpg`"
-                    alt="Header Avatar" style="width: 21px" />
+                    style="width: 21px" />
                   <span class="d-none d-sm-inline-block ms-2">{{
                       business.data.business.businessName
                   }}</span>
@@ -136,13 +135,13 @@ console.log(business.data.business);
                   aria-labelledby="page-header-user-dropdown">
                   <div class="p-3 text-center bg-body-light border-bottom rounded-top">
                     <img class="img-avatar img-avatar48 img-avatar-thumb"
-                      :src="`/assets/media/business/${business.data.business.businessPic}.jpg`" alt="Header Avatar" />
+                      :src="`/assets/media/business/${business.data.business.businessPic}.jpg`" />
                     <p class="mt-2 mb-0 fw-medium">
                       {{ business.data.business.businessName }}
                     </p>
                     <p class="mb-0 text-muted fs-sm fw-medium">{{ business.data.business.principalName }}</p>
                   </div>
-                  <div class="p-2">
+                  <!-- <div class="p-2">
                     <a class="dropdown-item d-flex align-items-center justify-content-between"
                       href="javascript:void(0)">
                       <span class="fs-sm fw-medium">Inbox</span>
@@ -158,12 +157,12 @@ console.log(business.data.business);
                       <span class="fs-sm fw-medium">Settings</span>
                     </a>
                   </div>
-                  <div role="separator" class="dropdown-divider m-0"></div>
+                  <div role="separator" class="dropdown-divider m-0"></div> -->
                   <div class="p-2">
-                    <RouterLink :to="{ name: 'auth-lock' }"
+                    <!-- <RouterLink :to="{ name: 'auth-lock' }"
                       class="dropdown-item d-flex align-items-center justify-content-between">
                       <span class="fs-sm fw-medium">Lock Account</span>
-                    </RouterLink>
+                    </RouterLink> -->
                     <RouterLink @click="logout()" :to="{ name: '' }"
                       class="dropdown-item d-flex align-items-center justify-content-between">
                       <span class="fs-sm fw-medium">登出</span>
@@ -174,7 +173,7 @@ console.log(business.data.business);
               <!-- END User Dropdown -->
 
               <!-- Notifications Dropdown -->
-              <div class="dropdown d-inline-block ms-2">
+              <!-- <div class="dropdown d-inline-block ms-2">
                 <button type="button" class="btn btn-sm btn-alt-secondary" id="page-header-notifications-dropdown"
                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i class="fa fa-fw fa-bell"></i>
@@ -217,14 +216,14 @@ console.log(business.data.business);
                     </a>
                   </div>
                 </div>
-              </div>
+              </div> -->
               <!-- END Notifications Dropdown -->
 
               <!-- Toggle Side Overlay -->
-              <button type="button" class="btn btn-sm btn-alt-secondary ms-2"
+              <!-- <button type="button" class="btn btn-sm btn-alt-secondary ms-2"
                 @click="store.sideOverlay({ mode: 'toggle' })">
                 <i class="fa fa-fw fa-list-ul fa-flip-horizontal"></i>
-              </button>
+              </button> -->
               <!-- END Toggle Side Overlay -->
             </slot>
           </div>

@@ -1,17 +1,20 @@
 <script setup>
-import { reactive, computed } from "vue";
+import { reactive, computed, inject } from "vue";
 import { useRouter } from "vue-router";
 import { useTemplateStore } from "@/stores/template";
 import Swal from "sweetalert2";
 import axios from "axios";
 
+
 // Vuelidate, for more info and examples you can check out https://github.com/vuelidate/vuelidate
 import useVuelidate from "@vuelidate/core";
-import { required, url } from "@vuelidate/validators";
+import { required } from "@vuelidate/validators";
 
 // Main store
 const store = useTemplateStore();
 const router = useRouter();
+const renovate = inject("reload");
+
 
 // Input state variables
 const state = reactive({
@@ -50,7 +53,7 @@ async function onSubmit() {
   axios
     .post("http://localhost:8088/login", user)
     .then(function (response) {
-      // console.log(response.data);
+
       if (response.status === 200) {
         // Swal.fire("登入成功 ~", "｡:.ﾟヽ(*´∀`)ﾉﾟ.:｡", "success");
         Swal.fire({
@@ -59,13 +62,18 @@ async function onSubmit() {
           timer: 1000,
           icon: "success"
         });
-        if (response.data.data.user != null) {
+        if (response.data.data.user != null && response.data.data.user.userId == 1) {
           localStorage.setItem("access-admin", JSON.stringify(response.data));
-          store.getStates({ admin: response.data });
+          // store.getStates({ admin: response.data });
           location.replace("http://localhost:8080/#/backend/dashboard");
-        } else {
-          localStorage.setItem("access-business", JSON.stringify(response.data));
-          store.getStates({ business: response.data });
+        } else if (response.data.data.user != null) {
+          localStorage.setItem("access-user", JSON.stringify(response.data));
+          // store.getStates({ admin: response.data });
+          location.replace("http://localhost:8080/#/");
+          renovate();
+        } else if (response.data.data.business != null) {
+          sessionStorage.setItem("access-business", JSON.stringify(response.data));
+          console.log(response);
           router.replace({ path: '/business/backend' });
         }
       }
@@ -83,6 +91,35 @@ async function onSubmit() {
 
   // Go to dashboard
   // router.push({ name: "backend-pages-auth" });
+}
+
+function addUser() {
+  state.account = 'hold10sec8763@gmail.com';
+  state.password = '10Sec8763';
+}
+
+function addUser2() {
+  state.account = 'nsdk8853@gmail.com';
+  state.password = 'Aa111111';
+}
+
+function addAdmin() {
+  state.account = 'a1kgkms11@gmail.com';
+  state.password = 'Aa222222';
+}
+
+function showPassword() {
+  var x = document.getElementById("login-password");
+  if (x.type === "password") {
+    x.type = "text";
+  } else {
+    x.type = "password";
+  }
+}
+
+function addform() {
+  state.account = 'carefuladdicted@gmail.com';
+  state.password = '10x65q76d53';
 }
 </script>
 
@@ -112,8 +149,8 @@ async function onSubmit() {
               <h1 class="h2 mb-1">登入「愛蔬網」</h1>
               <p class="fw-medium text-muted">愛蔬網是有279個用戶的美食平台</p>
               <p>點擊下方按鈕登入以繼續</p>
-              <p>登入後即代表您已閱讀並且</p>
-              同意<a href="#">服務條款</a>及<a href="#">隱私政策</a>
+              <!-- <p>登入後即代表您已閱讀並且</p>
+              同意<a href="#">服務條款</a>及<a href="#">隱私政策</a> -->
 
               <!-- Sign In Form -->
               <form @submit.prevent="onSubmit">
@@ -142,6 +179,10 @@ async function onSubmit() {
                         name="login-remember" />
                       <label class="form-check-label" for="login-remember"><b>記住我</b></label>
                     </div>
+                    <br>
+                    <div>
+                      <input class="form-check-input" type="checkbox" @click="showPassword()">&nbsp;&nbsp;<b>顯示密碼</b>
+                    </div>
                   </div>
                 </div>
                 <div class="row mb-4">
@@ -154,9 +195,33 @@ async function onSubmit() {
 
                   <div class="col-md-6 col-xl-5">
                     <RouterLink :to="{ name: 'userRegister' }" class="btn w-100 btn-alt-primary">
-                      <i class="fa fa-fw fa-sign-in-alt me-1 opacity-50">
-                        <b>註冊</b></i>
+                      <i class="fa fa-fw fa-sign-in-alt me-1 opacity-50"></i>
+                      <b>註冊</b>
                     </RouterLink>
+                  </div>
+                </div>
+                <div class="row mb-4">
+                  <div class="col-md-6 col-xl-5">
+                    <button type="button" class="btn w-100 btn-alt-success" @click="addUser">
+                      <i class="fa fa-fw fa-plus me-1 opacity-50"></i>會員
+                    </button>
+                  </div>
+                  <div class="col-md-6 col-xl-6">
+                    <button type="button" class="btn w-100 btn-alt-success" @click="addAdmin">
+                      <i class="fa fa-fw fa-plus me-1 opacity-50"></i>管理員
+                    </button>
+                  </div>
+                </div>
+                <div class="row mb-4">
+                  <div class="col-md-6 col-xl-6">
+                    <button type="button" class="btn w-100 btn-alt-success" @click="addUser2">
+                      <i class="fa fa-fw fa-plus me-1 opacity-50"></i>會員2
+                    </button>
+                  </div>
+                  <div class="col-md-6 col-xl-6">
+                    <button type="button" class="btn w-100 btn-alt-warning" @click="addform">
+                      <i class="fa fa-fw fa-store me-1 opacity-50"></i> 商家
+                    </button>
                   </div>
                 </div>
               </form>
@@ -178,6 +243,11 @@ async function onSubmit() {
   </div>
 </template>
 <script>
+import { useLoading } from "vue3-loading-overlay";
+const loader = useLoading({
+  loader: 'dots',
+  color: '#CCDBE2'
+});
 export default {
   data() {
     return {
@@ -197,7 +267,7 @@ export default {
 
       Swal.fire({
         title: "忘記密碼?",
-        text: `發送密碼信至${email},原本密碼將被覆蓋,請確認`,
+        html: `將發送密碼信至 ${email} <br> 原本密碼將被覆蓋  `,
         showCancelButton: true,
         confirmButtonText: "確認",
         cancelButtonText: '取消',
@@ -205,18 +275,35 @@ export default {
         allowOutsideClick: true,
 
         preConfirm: async () => {
+          loader.show();
           return axios.post("http://localhost:8088/user/sendMail", user)
             .then(response => {
-              console.log(response.status)
-              console.log(response.data)
+              console.log(response.status);
+              console.log(response.data);
               if (response.status === 200) {
+                loader.hide();
                 Swal.fire(`密碼信已寄出,請前往${email}查看`, "༼ つ ◕_◕ ༽つ", "success");
                 return response.data;
               }
             })
-            .catch(function (error) {
+            .catch(async () => {
+              return axios.post("http://localhost:8088/business/sendMail", user)
+                .then(response => {
+                  if (response.status === 200) {
+                    loader.hide();
+                    Swal.fire({
+                      title: "密碼信已寄出",
+                      text: `請前往${email}查看`,
+                      timer: 1000,
+                      icon: "success"
+                    });
+                    return response.data;
+                  }
+                })
+            }).catch((error) => {
               if (error.response.status === 400) {
-                Swal.fire("請確認帳號輸入正確", "◢▆▅▄▃崩╰(〒皿〒)╯潰▃▄▅▇◣", "error");
+                loader.hide();
+                Swal.fire("請確認帳號輸入是否正確", "／人◕ ‿崩‿ ◕人＼", "error");
               } else {
                 console.log(error.response.status)
                 console.log(error.response.data.error)
@@ -227,7 +314,7 @@ export default {
     }
   },
 };
-//加下面3行防止使用鍵盤(指alt + 鍵盤左鍵等)、滑鼠手勢等方式返回前頁,點連結前往的有些不能擋
+// 加下面3行防止使用鍵盤(指alt + 鍵盤左鍵等)、滑鼠手勢等方式返回前頁,點連結前往的有些不能擋
 history.pushState(null, null, document.URL);
 window.addEventListener('popstate', function () {
   history.pushState(null, null, document.URL);
